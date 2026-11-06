@@ -8,7 +8,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "test": "echo \"@payora/auth-service tests pending Phase 2 implementation\""
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit",
+    "migrate": "node src/migrations/runner.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
