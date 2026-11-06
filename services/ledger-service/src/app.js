@@ -1,8 +1,11 @@
 import express from "express";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { logger } from "./utils/logger.js";
+import { createWalletRouter } from "./routes/walletRoutes.js";
+import { createProviderRouter } from "./routes/providerRoutes.js";
+import { createTransferRouter } from "./routes/transferRoutes.js";
 
-export function createApp() {
+export function createApp(services = {}) {
   const app = express();
 
   app.use(express.json({ limit: "1mb" }));
@@ -33,6 +36,11 @@ export function createApp() {
       error: null,
     });
   });
+
+  // API Routes
+  app.use("/api/wallet", createWalletRouter(services));
+  app.use("/api/provider", createProviderRouter(services));
+  app.use("/api/transfers", createTransferRouter(services));
 
   // Standard error handling middleware
   app.use(errorHandler);
