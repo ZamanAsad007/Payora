@@ -1,0 +1,23 @@
+{
+  "name": "payora-monorepo",
+  "version": "1.0.0",
+  "description": "Financial-grade digital wallet and double-entry ledger platform",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "services/*",
+    "frontend"
+  ],
+  "scripts": {
+    "generate:secrets": "node scripts/generate-secrets.js",
+    "test:guardrails": "./scripts/test-guardrails.sh",
+    "test": "npm run test --workspaces --if-present",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "ZamanAsad007",
+  "license": "UNLICENSED"
+}
