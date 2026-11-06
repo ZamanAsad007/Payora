@@ -57,3 +57,12 @@ jobs:
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-secret-not-real-jwt-key-with-min-32-chars
           WEBHOOK_SECRET: test-secret-not-real-webhook-key-min-32-chars
+
+      - name: Run Concurrency & Correctness Tests
+        run: npm run test:concurrency --workspace=@payora/ledger-service
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:test-secret-not-real-password@localhost:5432/payora_ledger
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-not-real-jwt-key-with-min-32-chars
+          WEBHOOK_SECRET: test-secret-not-real-webhook-key-min-32-chars

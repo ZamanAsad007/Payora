@@ -11,6 +11,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit",
     "test:property": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/property",
+    "test:concurrency": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/concurrency",
     "migrate": "node src/migrations/runner.js"
   },
   "dependencies": {
