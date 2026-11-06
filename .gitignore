@@ -1,0 +1,28 @@
+# design docs (local only)
+WALLET_DESIGN.md
+walletdesign.md
+WALLETDESIGN.md
+
+# secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*service-account*.json
+credentials*.json
+secrets/
+*.sql.dump
+*.dump
+
+# dependencies & build
+node_modules/
+dist/
+build/
+coverage/
+.DS_Store
+*.log
