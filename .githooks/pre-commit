@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 1) Block forbidden filenames
+blocked='(^|/)\.env($|\.)|\.pem$|\.key$|\.p12$|\.pfx$|\.jks$|\.keystore$|service-account.*\.json$|\.dump$'
+files=$(git diff --cached --name-only --diff-filter=ACM | grep -E "$blocked" | grep -v '\.env\.example$' || true)
+if [ -n "$files" ]; then
+  echo "BLOCKED: secret-like files staged:"
+  echo "$files"
+  exit 1
+fi
+
+# 2) Content scan (gitleaks must be installed; fail if it is missing)
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "BLOCKED: gitleaks is not installed. Install it, then retry."
+  exit 1
+fi
+
+gitleaks git --pre-commit --staged --redact || {
+  echo "BLOCKED: possible secret found."
+  exit 1
+}
