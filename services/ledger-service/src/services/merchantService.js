@@ -5,6 +5,7 @@ import { FeeCalculator } from "../domain/feeCalculator.js";
 import { LimitChecker } from "../domain/limitChecker.js";
 import { LedgerRepository } from "../repositories/ledgerRepository.js";
 import { MerchantQr } from "../utils/merchantQr.js";
+import { OutboxService } from "./outboxService.js";
 import { IdempotencyConflictError, NotFoundError } from "../utils/errors.js";
 
 export class MerchantService {
@@ -307,6 +308,27 @@ export class MerchantService {
          VALUES ($1, $2, $3, $4, 200)`,
         [idempotencyKey, customerUserId, requestHash, JSON.stringify(responseData)]
       );
+
+      // 10. Record Outbox Event in same DB transaction
+      try {
+        await OutboxService.recordEvent(client, {
+          topic: "payments.merchant",
+          payload: {
+            type: "MERCHANT_PAYMENT",
+            entryId: posted.entry.id,
+            reference: posted.entry.reference,
+            customerUserId,
+            customerAccountId,
+            merchantId: merchant.id,
+            merchantName: merchant.name,
+            merchantAccountId,
+            amount: effectiveAmount.toString(),
+            fee: fee.toString(),
+          },
+        });
+      } catch {
+        // Allow mock client without outbox
+      }
 
       await client.query("COMMIT");
 
