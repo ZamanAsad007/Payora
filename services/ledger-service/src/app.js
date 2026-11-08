@@ -4,6 +4,7 @@ import { logger } from "./utils/logger.js";
 import { createWalletRouter } from "./routes/walletRoutes.js";
 import { createProviderRouter } from "./routes/providerRoutes.js";
 import { createTransferRouter } from "./routes/transferRoutes.js";
+import { createMerchantRouter, createPaymentRouter } from "./routes/merchantRoutes.js";
 
 export function createApp(services = {}) {
   const app = express();
@@ -41,6 +42,8 @@ export function createApp(services = {}) {
   app.use("/api/wallet", createWalletRouter(services));
   app.use("/api/provider", createProviderRouter(services));
   app.use("/api/transfers", createTransferRouter(services));
+  app.use("/api/merchants", createMerchantRouter(services));
+  app.use("/api/payments", createPaymentRouter(services));
 
   // Standard error handling middleware
   app.use(errorHandler);
