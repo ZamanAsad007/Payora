@@ -69,7 +69,7 @@ export class MerchantService {
         ...merchRes.rows[0],
         account: {
           id: accountId,
-          balance: 0n,
+          balance: "0",
           status: "ACTIVE",
           currency: "BDT",
         },
