@@ -8,10 +8,10 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
-    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit",
-    "test:property": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/property",
-    "test:concurrency": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/concurrency",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
+    "test:property": "NODE_OPTIONS=--experimental-vm-modules jest tests/property",
+    "test:concurrency": "NODE_OPTIONS=--experimental-vm-modules jest tests/concurrency",
     "migrate": "node src/migrations/runner.js"
   },
   "dependencies": {

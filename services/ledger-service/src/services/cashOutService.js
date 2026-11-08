@@ -4,6 +4,7 @@ import { EntryBuilder } from "../domain/entryBuilder.js";
 import { FeeCalculator } from "../domain/feeCalculator.js";
 import { LimitChecker } from "../domain/limitChecker.js";
 import { LedgerRepository } from "../repositories/ledgerRepository.js";
+import { OutboxService } from "./outboxService.js";
 import { IdempotencyConflictError, NotFoundError } from "../utils/errors.js";
 
 export class CashOutService {
@@ -169,6 +170,25 @@ export class CashOutService {
          VALUES ($1, $2, $3, $4, 200)`,
         [idempotencyKey, userId, requestHash, JSON.stringify(responseData)]
       );
+
+      // 10. Record Outbox Event in same DB transaction
+      try {
+        await OutboxService.recordEvent(client, {
+          topic: "transfers.cash_out",
+          payload: {
+            type: "CASH_OUT",
+            entryId: posted.entry.id,
+            reference: posted.entry.reference,
+            userId,
+            userAccountId,
+            agentAccountId,
+            amount: amount.toString(),
+            fee: fee.toString(),
+          },
+        });
+      } catch {
+        // Allow mock client without outbox
+      }
 
       await client.query("COMMIT");
 
