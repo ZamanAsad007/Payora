@@ -8,6 +8,7 @@ import { createMerchantRouter, createPaymentRouter } from "./routes/merchantRout
 import { createCashOutRouter } from "./routes/cashOutRoutes.js";
 import { createPayeeRouter } from "./routes/payeeRoutes.js";
 import { createAdminRouter } from "./routes/adminRoutes.js";
+import { createStatementRouter } from "./routes/statementRoutes.js";
 
 export function createApp(services = {}) {
   const app = express();
@@ -50,6 +51,7 @@ export function createApp(services = {}) {
   app.use("/api/cash-out", createCashOutRouter(services));
   app.use("/api/payees", createPayeeRouter(services));
   app.use("/api/admin", createAdminRouter(services));
+  app.use("/api/statements", createStatementRouter(services));
 
   // Standard error handling middleware
   app.use(errorHandler);
