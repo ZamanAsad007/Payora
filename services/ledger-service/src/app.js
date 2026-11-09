@@ -1,4 +1,5 @@
 import express from "express";
+import helmet from "helmet";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { logger } from "./utils/logger.js";
 import { createWalletRouter } from "./routes/walletRoutes.js";
@@ -13,7 +14,21 @@ import { createStatementRouter } from "./routes/statementRoutes.js";
 export function createApp(services = {}) {
   const app = express();
 
+  // Security headers via Helmet
+  app.use(helmet());
+
   app.use(express.json({ limit: "1mb" }));
+
+  // Basic CORS headers
+  app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Idempotency-Key, x-actor-id");
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(200);
+    }
+    next();
+  });
 
   // Basic request logging
   app.use((req, res, next) => {
