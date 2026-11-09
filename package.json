@@ -19,5 +19,8 @@
     "node": ">=20.0.0"
   },
   "author": "ZamanAsad007",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "helmet": "^8.3.0"
+  }
 }
