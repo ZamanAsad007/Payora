@@ -183,10 +183,12 @@ describe("Notification Service & Phone Masker", () => {
           userId: "user-test-api",
           title: "Payment Received",
           body: "500 BDT from 01712345678",
+          type: "PAYMENT_ALERT",
         });
 
       expect(dispatchRes.status).toBe(200);
       expect(dispatchRes.body.success).toBe(true);
+      expect(dispatchRes.body.data.type).toBe("PAYMENT_ALERT");
       const notificationId = dispatchRes.body.data.id;
 
       // 3. List notifications

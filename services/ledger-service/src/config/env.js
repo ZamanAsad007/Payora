@@ -7,6 +7,7 @@ export const envSchema = z.object({
   REDIS_URL: z.string().url({ message: "REDIS_URL must be a valid Redis connection URL" }),
   JWT_SECRET: z.string().min(32, { message: "JWT_SECRET must be at least 32 characters long" }),
   WEBHOOK_SECRET: z.string().min(32, { message: "WEBHOOK_SECRET must be at least 32 characters long" }),
+  MERCHANT_QR_SECRET: z.string().min(32, { message: "MERCHANT_QR_SECRET must be at least 32 characters long" }),
 });
 
 /**

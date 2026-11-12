@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { RuleEngine } from "../engine/ruleEngine.js";
+import { logger } from "../utils/logger.js";
 
 export class RiskService {
   constructor({ pool = null, ruleEngine = new RuleEngine(), onAutoHold = null } = {}) {
@@ -59,7 +60,10 @@ export class RiskService {
               reason: `Automatic risk hold: ${v.ruleCode} triggered`,
             });
           } catch (err) {
-            console.error(`[RiskService] Failed to trigger auto-hold for user ${userId}:`, err);
+            logger.error(
+              { err, userId, flagId: flag.id, ruleCode: v.ruleCode },
+              `[RiskService] Failed to trigger auto-hold for user ${userId}`
+            );
           }
         }
       }

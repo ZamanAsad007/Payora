@@ -15,7 +15,7 @@ export function createAuthApp(authService) {
   app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Idempotency-Key");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Idempotency-Key, x-user-id, x-device-fingerprint");
     if (req.method === "OPTIONS") {
       return res.sendStatus(200);
     }

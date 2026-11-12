@@ -9,6 +9,7 @@ describe("Environment Config Validation", () => {
     REDIS_URL: "redis://localhost:6379",
     JWT_SECRET: "test-secret-not-real-jwt-key-32chars",
     WEBHOOK_SECRET: "test-secret-not-real-webhook-key-32c",
+    MERCHANT_QR_SECRET: "test-secret-not-real-qr-key-32chars",
   };
 
   it("successfully parses valid environment variables", () => {
@@ -35,6 +36,12 @@ describe("Environment Config Validation", () => {
     const invalid = { ...validEnv };
     delete invalid.WEBHOOK_SECRET;
     expect(() => validateEnv(invalid)).toThrow("WEBHOOK_SECRET");
+  });
+
+  it("throws fail-fast error when MERCHANT_QR_SECRET is missing", () => {
+    const invalid = { ...validEnv };
+    delete invalid.MERCHANT_QR_SECRET;
+    expect(() => validateEnv(invalid)).toThrow("MERCHANT_QR_SECRET");
   });
 
   it("defaults NODE_ENV to development if omitted", () => {

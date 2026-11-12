@@ -1,9 +1,25 @@
 import crypto from "node:crypto";
+import { getEnv } from "../config/env.js";
 
 /**
  * Utility for generating and validating server-signed Merchant QR codes.
  */
 export class MerchantQr {
+  static resolveSecret(secret = null) {
+    if (secret) return secret;
+    if (process.env.NODE_ENV === "test" && !process.env.MERCHANT_QR_SECRET) {
+      return "test-merchant-qr-secret-key-32chars";
+    }
+    try {
+      return getEnv().MERCHANT_QR_SECRET;
+    } catch {
+      if (process.env.MERCHANT_QR_SECRET) {
+        return process.env.MERCHANT_QR_SECRET;
+      }
+      throw new Error("MERCHANT_QR_SECRET is required to generate or verify merchant QR codes");
+    }
+  }
+
   /**
    * Generate signed merchant QR payload string.
    *
@@ -20,8 +36,9 @@ export class MerchantQr {
     accountId,
     name,
     amount = null,
-    secret = process.env.JWT_SECRET || "default_merchant_qr_secret_key_32chars",
+    secret = null,
   }) {
+    const resolvedSecret = this.resolveSecret(secret);
     if (!merchantId || !accountId) {
       throw new Error("merchantId and accountId are required to generate QR code");
     }
@@ -37,7 +54,7 @@ export class MerchantQr {
 
     const serialized = JSON.stringify(payload);
     const signature = crypto
-      .createHmac("sha256", secret)
+      .createHmac("sha256", resolvedSecret)
       .update(serialized)
       .digest("hex");
 
@@ -58,8 +75,9 @@ export class MerchantQr {
    */
   static verify(
     qrString,
-    secret = process.env.JWT_SECRET || "default_merchant_qr_secret_key_32chars"
+    secret = null
   ) {
+    const resolvedSecret = this.resolveSecret(secret);
     if (!qrString || typeof qrString !== "string") {
       return { valid: false, error: "QR code payload is required" };
     }
@@ -80,7 +98,7 @@ export class MerchantQr {
 
       const { sig, ...dataWithoutSig } = parsed;
       const expectedSig = crypto
-        .createHmac("sha256", secret)
+        .createHmac("sha256", resolvedSecret)
         .update(JSON.stringify(dataWithoutSig))
         .digest("hex");
 

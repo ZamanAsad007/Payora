@@ -7,11 +7,11 @@ export function createNotificationRouter({ notificationService = new Notificatio
   // POST /api/notifications/dispatch
   router.post("/dispatch", async (req, res, next) => {
     try {
-      const { channel, userId, to, toPhone, subject, title, body, message } = req.body;
+      const { channel, userId, to, toPhone, subject, title, body, message, type } = req.body;
 
       let result;
       if (channel === "IN_APP") {
-        result = await notificationService.sendInApp({ userId, title, body });
+        result = await notificationService.sendInApp({ userId, title, body, type });
       } else if (channel === "EMAIL") {
         result = await notificationService.sendEmail({ to, subject, text: body || message });
       } else if (channel === "SMS") {

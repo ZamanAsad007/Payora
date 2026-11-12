@@ -257,8 +257,14 @@ export class AuthService {
     }
 
     const currentPinHash = userRes.rows[0].pin_hash;
-    // If PIN was already set, old PIN must be verified
-    if (currentPinHash && oldPin) {
+    // If PIN was already set, old PIN is REQUIRED and must be verified
+    if (currentPinHash) {
+      if (!oldPin) {
+        const err = new Error("Current transaction PIN is required to change PIN");
+        err.code = "OLD_PIN_REQUIRED";
+        err.statusCode = 400;
+        throw err;
+      }
       const isOldPinValid = await verifyPin(oldPin, currentPinHash);
       if (!isOldPinValid) {
         const err = new Error("Current transaction PIN is incorrect");
