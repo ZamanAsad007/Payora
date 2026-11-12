@@ -4,7 +4,7 @@
 [![Secret Scan](https://github.com/ZamanAsad007/Payora/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/ZamanAsad007/Payora/actions/workflows/secret-scan.yml)
 [![License: UNLICENSED](https://img.shields.io/badge/License-UNLICENSED-blue.svg)](#)
 [![Version](https://img.shields.io/badge/Release-v1.0.0-brightgreen.svg)](#)
-[![Tests](https://img.shields.io/badge/Tests-132%20passed-brightgreen.svg)](#7-running-tests)
+[![Tests](https://img.shields.io/badge/Tests-135%20passed-brightgreen.svg)](#7-running-tests)
 [![Node](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-green.svg)](#)
 
 Payora is a **financial-grade digital wallet and double-entry ledger platform** inspired by modern mobile financial services (MFS) such as bKash and Nagad. Users hold balances in Bangladeshi Taka (stored as integer **poisha** to avoid floating-point errors), top up funds via a mock payment provider, send peer-to-peer transfers, pay merchants via signed QR codes, and cash out via agent networks.
@@ -245,7 +245,7 @@ Copy `.env.example` to `.env` and run `npm run generate:secrets` to auto-populat
 
 ## 7. Running Tests
 
-Payora features a comprehensive test suite: **132 tests across all microservices**, covering unit logic, property-based generative testing (fast-check), HTTP integration tests (Supertest), and multi-threaded concurrency simulations.
+Payora features a comprehensive test suite: **135 tests across all microservices**, covering unit logic, property-based generative testing (fast-check), HTTP integration tests (Supertest), and multi-threaded concurrency simulations.
 
 ```bash
 # Run the complete test suite across all microservices
@@ -272,12 +272,12 @@ npm run test:guardrails
 
 | Service | Test Suites | Tests |
 |---|---|---|
-| `auth-service` | 3 | 19 |
-| `ledger-service` | 17 | 96 |
+| `auth-service` | 3 | 20 |
+| `ledger-service` | 17 | 98 |
 | `mock-provider` | 1 | 4 |
 | `notification-service` | 1 | 6 |
 | `risk-service` | 1 | 7 |
-| **Total** | **23** | **132** |
+| **Total** | **23** | **135** |
 
 ---
 

@@ -305,5 +305,27 @@ describe("AuthService Unit Tests", () => {
         details: { attemptsRemaining: 2 },
       });
     });
+
+    it("requires old PIN when updating an existing PIN", async () => {
+      await authService.setPin({ userId: testUserId, pin: "1234" });
+
+      // Attempt to change without oldPin
+      await expect(authService.setPin({ userId: testUserId, pin: "5678" })).rejects.toMatchObject({
+        code: "OLD_PIN_REQUIRED",
+      });
+
+      // Attempt to change with wrong oldPin
+      await expect(authService.setPin({ userId: testUserId, pin: "5678", oldPin: "0000" })).rejects.toMatchObject({
+        code: "INVALID_PIN",
+      });
+
+      // Change with correct oldPin succeeds
+      const res = await authService.setPin({ userId: testUserId, pin: "5678", oldPin: "1234" });
+      expect(res.success).toBe(true);
+
+      // Verify new pin works
+      const verifyNew = await authService.verifyPin({ userId: testUserId, pin: "5678" });
+      expect(verifyNew.valid).toBe(true);
+    });
   });
 });

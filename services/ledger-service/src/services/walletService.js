@@ -94,7 +94,8 @@ export class WalletService {
         sql += ` AND j.created_at < $${params.length}`;
       }
 
-      params.push(Math.min(limit, 50));
+      const clampedLimit = Math.min(limit, 50);
+      params.push(clampedLimit);
       sql += ` ORDER BY j.created_at DESC LIMIT $${params.length}`;
 
       const res = await client.query(sql, params);
@@ -111,12 +112,13 @@ export class WalletService {
         createdAt: r.created_at,
       }));
 
-      const nextCursor = items.length > 0 ? items[items.length - 1].createdAt : null;
+      const hasMore = items.length === clampedLimit;
+      const nextCursor = hasMore ? items[items.length - 1].createdAt : null;
 
       return {
         items,
         nextCursor,
-        hasMore: items.length === Math.min(limit, 50),
+        hasMore,
       };
     } finally {
       if (shouldRelease) client.release();

@@ -315,5 +315,17 @@ describe("Transfer & Top-Up Service Integration", () => {
       expect(balance.balanceTaka).toBe("1000.00");
       expect(balance.formatted).toBe("৳ 1,000.00");
     });
+
+    it("returns transactions with correct pagination hasMore and nextCursor", async () => {
+      const history = await walletService.getTransactions({
+        userId: "user-alice",
+        limit: 20,
+        customClient: mockDb.mockClient,
+      });
+
+      expect(Array.isArray(history.items)).toBe(true);
+      expect(history.hasMore).toBe(false);
+      expect(history.nextCursor).toBeNull();
+    });
   });
 });

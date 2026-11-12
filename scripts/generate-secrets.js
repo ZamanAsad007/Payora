@@ -38,6 +38,7 @@ function main() {
 
   const jwtSecret = generateSecureRandomHex(32);
   const webhookSecret = generateSecureRandomHex(32);
+  const merchantQrSecret = generateSecureRandomHex(32);
   const dbPassword = generateSecureRandomHex(16);
 
   // Replace placeholders
@@ -48,6 +49,10 @@ function main() {
   envContent = envContent.replace(
     /WEBHOOK_SECRET=.*/g,
     `WEBHOOK_SECRET=${webhookSecret}`
+  );
+  envContent = envContent.replace(
+    /MERCHANT_QR_SECRET=.*/g,
+    `MERCHANT_QR_SECRET=${merchantQrSecret}`
   );
   envContent = envContent.replace(
     /POSTGRES_PASSWORD=.*/g,

@@ -19,6 +19,8 @@ export class ReconciliationJob {
     this.timer = setInterval(async () => {
       await this.runOnce();
     }, this.intervalMs);
+    // unref so the timer does not prevent Node from exiting cleanly
+    this.timer.unref();
   }
 
   stop() {
