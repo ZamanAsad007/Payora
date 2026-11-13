@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY services/mock-provider/package*.json ./services/mock-provider/
 
-RUN npm ci --workspace=@payora/mock-provider --omit=dev
+RUN npm ci --workspace=@payora/mock-provider --omit=dev && \
+    mkdir -p /app/services/mock-provider/node_modules
 
 FROM node:20-alpine AS runner
 
@@ -18,6 +19,7 @@ ENV PORT=3004
 USER node
 
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/services/mock-provider/node_modules ./services/mock-provider/node_modules
 COPY --chown=node:node services/mock-provider/src ./services/mock-provider/src
 COPY --chown=node:node services/mock-provider/package.json ./services/mock-provider/package.json
 COPY --chown=node:node package.json ./

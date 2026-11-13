@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
       POSTGRES_DB: ${POSTGRES_DB:-payora_ledger}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -26,7 +26,7 @@ services:
     container_name: payora-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6380}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -84,6 +84,7 @@ services:
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
       WEBHOOK_SECRET: ${WEBHOOK_SECRET:?WEBHOOK_SECRET must be set in .env}
+      MERCHANT_QR_SECRET: ${MERCHANT_QR_SECRET:?MERCHANT_QR_SECRET must be set in .env}
     depends_on:
       postgres:
         condition: service_healthy

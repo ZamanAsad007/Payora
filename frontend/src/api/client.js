@@ -48,6 +48,21 @@ export async function apiRequest(endpoint, { method = "GET", body = null, header
     reqHeaders["Authorization"] = `Bearer ${token}`;
   }
 
+  const storedUser = localStorage.getItem("payora_user");
+  if (storedUser) {
+    try {
+      const u = JSON.parse(storedUser);
+      if (u?.id && !reqHeaders["x-user-id"]) {
+        reqHeaders["x-user-id"] = u.id;
+      }
+      if (u?.id && !reqHeaders["x-actor-id"]) {
+        reqHeaders["x-actor-id"] = u.id;
+      }
+    } catch {
+      // ignore json parse errors
+    }
+  }
+
   if (requiresIdempotency) {
     reqHeaders["Idempotency-Key"] = generateIdempotencyKey();
   }

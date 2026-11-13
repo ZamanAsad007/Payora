@@ -24,6 +24,21 @@ function generateSecureRandomHex(bytes = 32) {
   return crypto.randomBytes(bytes).toString("hex");
 }
 
+function setOrAppendKey(content, key, value) {
+  const regex = new RegExp(`^${key}=.*$`, "m");
+  if (regex.test(content)) {
+    return content.replace(regex, `${key}=${value}`);
+  }
+  return `${content.trimEnd()}\n${key}=${value}\n`;
+}
+
+function shouldReplace(content, key) {
+  const match = content.match(new RegExp(`^${key}=(.*)$`, "m"));
+  if (!match) return true;
+  const val = match[1].trim();
+  return !val || val.includes("replace-me");
+}
+
 function main() {
   let envContent = "";
 
@@ -36,35 +51,46 @@ function main() {
     process.exit(1);
   }
 
-  const jwtSecret = generateSecureRandomHex(32);
-  const webhookSecret = generateSecureRandomHex(32);
-  const merchantQrSecret = generateSecureRandomHex(32);
-  const dbPassword = generateSecureRandomHex(16);
+  const isForce = process.argv.includes("--force");
 
-  // Replace placeholders
+  // Generate new secrets or preserve existing valid ones
+  let jwtSecret = generateSecureRandomHex(32);
+  let webhookSecret = generateSecureRandomHex(32);
+  let merchantQrSecret = generateSecureRandomHex(32);
+  let dbPassword = generateSecureRandomHex(16);
+
+  if (!isForce && !shouldReplace(envContent, "POSTGRES_PASSWORD")) {
+    const m = envContent.match(/^POSTGRES_PASSWORD=(.*)$/m);
+    dbPassword = m[1].trim();
+  }
+  if (!isForce && !shouldReplace(envContent, "JWT_SECRET")) {
+    const m = envContent.match(/^JWT_SECRET=(.*)$/m);
+    jwtSecret = m[1].trim();
+  }
+  if (!isForce && !shouldReplace(envContent, "WEBHOOK_SECRET")) {
+    const m = envContent.match(/^WEBHOOK_SECRET=(.*)$/m);
+    webhookSecret = m[1].trim();
+  }
+  if (!isForce && !shouldReplace(envContent, "MERCHANT_QR_SECRET")) {
+    const m = envContent.match(/^MERCHANT_QR_SECRET=(.*)$/m);
+    merchantQrSecret = m[1].trim();
+  }
+
+  // Set or replace keys
+  envContent = setOrAppendKey(envContent, "JWT_SECRET", jwtSecret);
+  envContent = setOrAppendKey(envContent, "WEBHOOK_SECRET", webhookSecret);
+  envContent = setOrAppendKey(envContent, "MERCHANT_QR_SECRET", merchantQrSecret);
+  envContent = setOrAppendKey(envContent, "POSTGRES_PASSWORD", dbPassword);
+  envContent = setOrAppendKey(envContent, "POSTGRES_PORT", "5433");
+  envContent = setOrAppendKey(envContent, "REDIS_PORT", "6380");
+
   envContent = envContent.replace(
-    /JWT_SECRET=.*/g,
-    `JWT_SECRET=${jwtSecret}`
-  );
-  envContent = envContent.replace(
-    /WEBHOOK_SECRET=.*/g,
-    `WEBHOOK_SECRET=${webhookSecret}`
-  );
-  envContent = envContent.replace(
-    /MERCHANT_QR_SECRET=.*/g,
-    `MERCHANT_QR_SECRET=${merchantQrSecret}`
-  );
-  envContent = envContent.replace(
-    /POSTGRES_PASSWORD=.*/g,
-    `POSTGRES_PASSWORD=${dbPassword}`
-  );
-  envContent = envContent.replace(
-    /postgres:replace-me-postgres-password@/g,
+    /postgres:[^@]+@/g,
     `postgres:${dbPassword}@`
   );
 
   fs.writeFileSync(envPath, envContent, { mode: 0o600 });
-  console.log("Successfully generated secrets and updated .env (0600 permissions).");
+  console.log("Successfully validated/updated secrets in .env (0600 permissions).");
   console.log("No secrets were displayed to terminal output.");
 }
 

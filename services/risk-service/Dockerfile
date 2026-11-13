@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY services/risk-service/package*.json ./services/risk-service/
 
-RUN npm ci --workspace=@payora/risk-service --omit=dev
+RUN npm ci --workspace=@payora/risk-service --omit=dev && \
+    mkdir -p /app/services/risk-service/node_modules
 
 FROM node:20-alpine AS runner
 
@@ -18,6 +19,7 @@ ENV PORT=3003
 USER node
 
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/services/risk-service/node_modules ./services/risk-service/node_modules
 COPY --chown=node:node services/risk-service/src ./services/risk-service/src
 COPY --chown=node:node services/risk-service/package.json ./services/risk-service/package.json
 COPY --chown=node:node package.json ./

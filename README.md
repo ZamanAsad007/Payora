@@ -196,25 +196,64 @@ COMMIT;
 - **Node.js** ≥ 20.x (for running tests locally)
 - **Git** (with `.githooks/` pre-commit hooks installed)
 
-### 6.2 One-Command Launch
+### 6.2 One-Command Launch (Recommended)
 
+Using **Make**:
 ```bash
-# 1. Clone the repository
-git clone https://github.com/ZamanAsad007/Payora.git
-cd Payora
+# Setup environment, build cluster, apply migrations, and seed demo accounts
+make dev
+```
 
-# 2. Install Git hooks
+Or using **npm / Docker Compose** directly:
+```bash
+# 1. Install Git pre-commit security hooks
 git config core.hooksPath .githooks
 
-# 3. Configure environment with securely generated cryptographic keys
+# 2. Configure environment with securely generated cryptographic keys
 cp .env.example .env
 npm run generate:secrets
 
-# 4. Spin up the full microservice cluster
+# 3. Spin up the full microservice cluster
 docker compose up --build -d
+
+# 4. Run database schema migrations & seed demo accounts
+npm run migrate
+npm run seed
 ```
 
-### 6.3 Service URLs
+### 6.3 Demo Login Credentials & Seed Data
+
+All accounts are pre-seeded with fake funds in Bangladeshi Taka (stored as minor units in poisha):
+
+| Role | Name | Phone Number | Password | PIN | Initial Balance | Details / Purpose |
+|---|---|---|---|---|---|---|
+| **User** | Alice Rahman | `01700000001` | `Password123!` | `1234` | ৳ 5,000.00 | Primary demo user (P2P send, QR pay, cash out) |
+| **User** | Bob Hossain | `01700000002` | `Password123!` | `4321` | ৳ 2,000.00 | Saved payee of Alice (P2P recipient / transfers) |
+| **Merchant** | SuperMart Dhaka | `01700000003` | `Password123!` | `9876` | ৳ 10,000.00 | Merchant Code: `00000000-0000-0000-0000-000000000001` |
+| **Agent** | Karim Agent Point | `01700000004` | `Password123!` | `5555` | ৳ 50,000.00 | Destination agent for Cash-Out operations |
+| **Admin** | Admin Auditor | `01700000000` | `Password123!` | `0000` | ৳ 50,000.00 | Unlocks the `/admin` dashboard (reconciliation, freeze, reversals) |
+
+> 💡 The login screen also features 1-click **Quick Demo Account** buttons to instantly populate credentials!
+
+### 6.4 Make Command Reference
+
+| Command | Description |
+|---|---|
+| `make dev` | All-in-one bootstrap: `init` + `up-build` + `migrate` + `seed` |
+| `make up` / `make up-build` | Launch microservice cluster in detached mode |
+| `make down` | Stop running containers |
+| `make down-v` / `make clean` | Stop containers and wipe persistent PostgreSQL & Redis volumes |
+| `make status` / `make ps` | Check health and status of all containers |
+| `make logs` | Stream real-time logs across all services |
+| `make logs-<service>` | Stream logs for specific service (e.g. `logs-gateway`, `logs-ledger`, `logs-auth`, `logs-db`) |
+| `make migrate` | Execute pending database migrations |
+| `make seed` | Re-populate demo users, merchant, agent, and initial balances |
+| `make test` | Run complete unit, property, and concurrency test suite (135 tests) |
+| `make test-guardrails` | Verify pre-commit gitleaks & secret prevention checks |
+| `make shell-db` | Open interactive PostgreSQL `psql` console |
+| `make shell-redis` | Open interactive Redis CLI |
+
+### 6.5 Service URLs
 
 | Service | URL |
 |---|---|

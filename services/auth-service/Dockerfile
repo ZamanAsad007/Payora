@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY services/auth-service/package*.json ./services/auth-service/
 
-RUN npm ci --workspace=@payora/auth-service --omit=dev
+RUN npm ci --workspace=@payora/auth-service --omit=dev && \
+    mkdir -p /app/services/auth-service/node_modules
 
 FROM node:20-alpine AS runner
 
@@ -18,7 +19,9 @@ ENV PORT=3001
 USER node
 
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/services/auth-service/node_modules ./services/auth-service/node_modules
 COPY --chown=node:node services/auth-service/src ./services/auth-service/src
+COPY --chown=node:node services/auth-service/migrations ./services/auth-service/migrations
 COPY --chown=node:node services/auth-service/package.json ./services/auth-service/package.json
 COPY --chown=node:node package.json ./
 

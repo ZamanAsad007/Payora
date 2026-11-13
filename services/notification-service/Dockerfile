@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY services/notification-service/package*.json ./services/notification-service/
 
-RUN npm ci --workspace=@payora/notification-service --omit=dev
+RUN npm ci --workspace=@payora/notification-service --omit=dev && \
+    mkdir -p /app/services/notification-service/node_modules
 
 FROM node:20-alpine AS runner
 
@@ -18,6 +19,7 @@ ENV PORT=3002
 USER node
 
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/services/notification-service/node_modules ./services/notification-service/node_modules
 COPY --chown=node:node services/notification-service/src ./services/notification-service/src
 COPY --chown=node:node services/notification-service/package.json ./services/notification-service/package.json
 COPY --chown=node:node package.json ./
