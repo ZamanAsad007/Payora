@@ -254,3 +254,99 @@ a {
 .data-table tr:hover td {
   background-color: var(--bg-card-hover);
 }
+
+/* Navigation & Profile Dropdown Styles */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+  background-color: #1e293b;
+}
+
+.nav-link.active {
+  color: #ffffff;
+  background-color: #1e293b;
+}
+
+.nav-icon-btn:hover {
+  background-color: #1e293b !important;
+  color: var(--text-primary) !important;
+}
+
+.profile-trigger-btn:hover {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dropdown-section-title {
+  padding: 0.45rem 1rem 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.dropdown-item:hover {
+  background-color: #1e293b;
+  color: var(--text-primary);
+}
+
+.dropdown-item.active {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+}
+
+.dropdown-item.danger {
+  color: #f87171;
+}
+
+.dropdown-item.danger:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+@media (min-width: 641px) {
+  .mobile-nav-items {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .desktop-nav-items {
+    display: none !important;
+  }
+  .profile-trigger-text {
+    display: none !important;
+  }
+}
+

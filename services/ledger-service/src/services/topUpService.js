@@ -111,10 +111,16 @@ export class TopUpService {
       }
 
       // 3. Find user wallet account and bank clearing account
-      const userAccRes = await client.query(
+      let userAccRes = await client.query(
         "SELECT id FROM accounts WHERE owner_id = $1 AND type = 'USER_WALLET'",
         [topUp.user_id]
       );
+      if (userAccRes.rows.length === 0) {
+        userAccRes = await client.query(
+          "SELECT id FROM accounts WHERE owner_id = $1 AND type = 'MERCHANT_WALLET'",
+          [topUp.user_id]
+        );
+      }
       if (userAccRes.rows.length === 0) {
         throw new Error(`User wallet account not found for user: ${topUp.user_id}`);
       }

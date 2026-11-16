@@ -2,6 +2,13 @@ import express from "express";
 import helmet from "helmet";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { logger } from "./utils/logger.js";
+
+// Ensure BigInt serialization does not crash JSON.stringify
+if (typeof BigInt.prototype.toJSON !== "function") {
+  BigInt.prototype.toJSON = function () {
+    return this.toString();
+  };
+}
 import { createWalletRouter } from "./routes/walletRoutes.js";
 import { createProviderRouter } from "./routes/providerRoutes.js";
 import { createTransferRouter } from "./routes/transferRoutes.js";
