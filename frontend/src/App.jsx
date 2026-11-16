@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import { Navbar } from "./components/Navbar.jsx";
+import { BottomNav } from "./components/BottomNav.jsx";
 import { Login } from "./pages/Login.jsx";
 import { Register } from "./pages/Register.jsx";
 import { PinSetup } from "./pages/PinSetup.jsx";
@@ -144,6 +145,7 @@ export function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
+          <BottomNav />
         </div>
       </BrowserRouter>
     </AuthProvider>
