@@ -84,17 +84,31 @@ export class MerchantService {
   }
 
   /**
-   * Get merchant by ID
+   * Get merchant by ID, phone number, or name.
    */
   async getMerchantById(merchantId) {
-    const res = await this.getDbPool().query(
-      `SELECT m.id, m.owner_id, m.name, m.account_id, m.qr_code, m.status, m.created_at,
-              a.balance, a.currency, a.status as account_status
-       FROM merchants m
-       JOIN accounts a ON a.id = m.account_id
-       WHERE m.id = $1`,
-      [merchantId]
-    );
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(merchantId);
+    let res;
+    if (isUuid) {
+      res = await this.getDbPool().query(
+        `SELECT m.id, m.owner_id, m.name, m.account_id, m.qr_code, m.status, m.created_at,
+                a.balance, a.currency, a.status as account_status
+         FROM merchants m
+         JOIN accounts a ON a.id = m.account_id
+         WHERE m.id = $1`,
+        [merchantId]
+      );
+    } else {
+      res = await this.getDbPool().query(
+        `SELECT m.id, m.owner_id, m.name, m.account_id, m.qr_code, m.status, m.created_at,
+                a.balance, a.currency, a.status as account_status
+         FROM merchants m
+         JOIN accounts a ON a.id = m.account_id
+         LEFT JOIN users u ON u.id = m.owner_id
+         WHERE u.phone = $1 OR LOWER(m.name) = LOWER($1) OR m.id::text = $1`,
+        [merchantId]
+      );
+    }
 
     if (res.rows.length === 0) {
       throw new NotFoundError(`Merchant not found: ${merchantId}`);
@@ -219,15 +233,29 @@ export class MerchantService {
       }
       const customerAccountId = custAccRes.rows[0].id;
 
-      // 3. Resolve Merchant & Merchant Account
-      const merchRes = await client.query(
-        `SELECT m.id, m.owner_id, m.name, m.account_id, m.status as merchant_status,
-                a.status as account_status
-         FROM merchants m
-         JOIN accounts a ON a.id = m.account_id
-         WHERE m.id = $1`,
-        [merchantId]
-      );
+      // 3. Resolve Merchant & Merchant Account (by UUID, phone number, or name)
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(merchantId);
+      let merchRes;
+      if (isUuid) {
+        merchRes = await client.query(
+          `SELECT m.id, m.owner_id, m.name, m.account_id, m.status as merchant_status,
+                  a.status as account_status
+           FROM merchants m
+           JOIN accounts a ON a.id = m.account_id
+           WHERE m.id = $1`,
+          [merchantId]
+        );
+      } else {
+        merchRes = await client.query(
+          `SELECT m.id, m.owner_id, m.name, m.account_id, m.status as merchant_status,
+                  a.status as account_status
+           FROM merchants m
+           JOIN accounts a ON a.id = m.account_id
+           LEFT JOIN users u ON u.id = m.owner_id
+           WHERE u.phone = $1 OR LOWER(m.name) = LOWER($1) OR m.id::text = $1`,
+          [merchantId]
+        );
+      }
       if (merchRes.rows.length === 0) {
         throw new NotFoundError(`Merchant not found: ${merchantId}`);
       }

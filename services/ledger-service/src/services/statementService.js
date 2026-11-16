@@ -33,10 +33,16 @@ export class StatementService {
     const client = await this.getDbPool().connect();
     try {
       // 1. Resolve user's account
-      const accRes = await client.query(
+      let accRes = await client.query(
         "SELECT id, owner_id, type, currency, balance, status FROM accounts WHERE owner_id = $1 AND type = 'USER_WALLET'",
         [userId]
       );
+      if (accRes.rows.length === 0) {
+        accRes = await client.query(
+          "SELECT id, owner_id, type, currency, balance, status FROM accounts WHERE owner_id = $1 AND type = 'MERCHANT_WALLET'",
+          [userId]
+        );
+      }
 
       if (accRes.rows.length === 0) {
         throw new NotFoundError(`User wallet account not found for user: ${userId}`);

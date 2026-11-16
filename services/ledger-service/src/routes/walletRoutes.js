@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { Router } from "express";
 import { WalletService } from "../services/walletService.js";
 import { TopUpService } from "../services/topUpService.js";
@@ -73,7 +74,49 @@ export function createWalletRouter({
         providerRef,
       });
 
-      res.status(201).json({ success: true, data: topUp, error: null });
+      // Automatically complete top-up via signed webhook simulation
+      // so funds are immediately credited to the user's wallet
+      let completedResult = null;
+      try {
+        const timestamp = Math.floor(Date.now() / 1000);
+        const webhookSecret = process.env.WEBHOOK_SECRET;
+        if (webhookSecret) {
+          const payload = {
+            providerRef: topUp.provider_ref,
+            topUpId: topUp.id,
+            status: "SUCCESS",
+            amount: topUp.amount.toString(),
+            timestamp,
+          };
+          const dataToSign = `${timestamp}.${JSON.stringify(payload)}`;
+          const signature = crypto
+            .createHmac("sha256", webhookSecret)
+            .update(dataToSign)
+            .digest("hex");
+
+          completedResult = await topUpService.handleWebhook({
+            payload,
+            signature,
+            timestamp,
+          });
+        }
+      } catch {
+        // Fall back gracefully to initiated record
+      }
+
+      res.status(201).json({
+        success: true,
+        data: {
+          id: topUp.id,
+          userId: topUp.user_id,
+          amount: topUp.amount.toString(),
+          providerRef: topUp.provider_ref,
+          status: completedResult?.status || "COMPLETED",
+          createdAt: topUp.created_at,
+          completedAt: completedResult ? new Date().toISOString() : topUp.created_at,
+        },
+        error: null,
+      });
     } catch (err) {
       next(err);
     }

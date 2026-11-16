@@ -19,10 +19,17 @@ export class WalletService {
     const shouldRelease = !customClient;
 
     try {
-      const res = await client.query(
+      let res = await client.query(
         "SELECT id, balance, currency, status FROM accounts WHERE owner_id = $1 AND type = 'USER_WALLET'",
         [userId]
       );
+
+      if (res.rows.length === 0) {
+        res = await client.query(
+          "SELECT id, balance, currency, status FROM accounts WHERE owner_id = $1 AND type = 'MERCHANT_WALLET'",
+          [userId]
+        );
+      }
 
       if (res.rows.length === 0) {
         throw new NotFoundError("Wallet account not found for user");
@@ -59,10 +66,16 @@ export class WalletService {
 
     try {
       // Find user account
-      const accRes = await client.query(
+      let accRes = await client.query(
         "SELECT id FROM accounts WHERE owner_id = $1 AND type = 'USER_WALLET'",
         [userId]
       );
+      if (accRes.rows.length === 0) {
+        accRes = await client.query(
+          "SELECT id FROM accounts WHERE owner_id = $1 AND type = 'MERCHANT_WALLET'",
+          [userId]
+        );
+      }
       if (accRes.rows.length === 0) {
         throw new NotFoundError("Wallet account not found");
       }

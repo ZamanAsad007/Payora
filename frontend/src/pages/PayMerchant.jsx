@@ -176,11 +176,29 @@ export function PayMerchant() {
 
         <form onSubmit={handleOpenPin}>
           <div className="input-group">
-            <label className="input-label">Merchant Code or QR String</label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <label className="input-label">Merchant Code, Phone, or QR</label>
+              <button
+                type="button"
+                onClick={() => setMerchantIdOrQr("00000000-0000-0000-0000-000000000001")}
+                style={{
+                  background: "rgba(245, 158, 11, 0.15)",
+                  border: "1px solid rgba(245, 158, 11, 0.3)",
+                  color: "#fbbf24",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  padding: "0.2rem 0.5rem",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Demo: SuperMart Dhaka
+              </button>
+            </div>
             <input
               type="text"
               className="input-field"
-              placeholder="e.g. MCH-SWAPNO-DHK or UUID"
+              placeholder="e.g. 00000000-0000-0000-0000-000000000001 or 01700000003"
               value={merchantIdOrQr}
               onChange={(e) => setMerchantIdOrQr(e.target.value)}
               required
